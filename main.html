@@ -1,16 +1,156 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-	<link rel="stylesheet" href="styles.css">
+  <style>
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .game-container > div {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
-
 <body>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
-</script>
+  <div class="game-container">
+    <div>
+      <label for="game-number">Number of Turns:</label>
+      <input type="number" id="game-number" min="1">
+    </div>
+    <button id="play-game">Play</button>
+    <div>
+      <button data-ns-test="rock">Rock</button>
+      <button data-ns-test="paper">Paper</button>
+      <button data-ns-test="scissors">Scissors</button>
+    </div>
+    <div>
+      <strong>Rounds Left:</strong>
+      <span data-ns-test="rounds-left">0</span>
+    </div>
+    <div>
+      <strong>User Points:</strong>
+      <span data-ns-test="user-points">0</span>
+    </div>
+    <div>
+      <strong>Computer Points:</strong>
+      <span data-ns-test="computer-points">0</span>
+    </div>
+    <div>
+      <strong>Round Result:</strong>
+      <span data-ns-test="round-result"></span>
+    </div>
+    <div>
+      <strong>Game Result:</strong>
+      <span data-ns-test="game-result"></span>
+    </div>
+  </div>
 
+  <script>
+    // Initialize game state
+    let turnsLeft = 0;
+    let userPoints = 0;
+    let computerPoints = 0;
+    let gameResult = "";
+
+    // Set up event listeners
+    const playButton = document.getElementById("play-game");
+    playButton.addEventListener("click", startGame);
+
+    const rockButton = document.querySelector("button[data-ns-test='rock']");
+    rockButton.addEventListener("click", () => playRound("ROCK"));
+
+    const paperButton = document.querySelector("button[data-ns-test='paper']");
+    paperButton.addEventListener("click", () => playRound("PAPER"));
+
+    const scissorsButton = document.querySelector("button[data-ns-test='scissors']");
+    scissorsButton.addEventListener("click", () => playRound("SCISSORS"));
+
+    // Function to start the game
+    function startGame() {
+      const gameNumberInput = document.getElementById("game-number");
+      turnsLeft = parseInt(gameNumberInput.value);
+
+      if (turnsLeft < 1 || isNaN(turnsLeft)) {
+        alert("Please enter a valid number of turns.");
+        return;
+      }
+
+      userPoints = 0;
+      computerPoints = 0;
+      gameResult = "";
+
+      updateUI();
+    }
+
+    // Function to play a round
+    function playRound(userChoice) {
+      if (turnsLeft === 0) {
+        alert("Please start the game first.");
+        return;
+      }
+
+      const computerChoice = computerChoose();
+      let roundResult = "";
+
+      if (userChoice === computerChoice) {
+        roundResult = "TIE";
+      } else if (
+        (userChoice === "ROCK" && computerChoice === "SCISSORS") ||
+        (userChoice === "PAPER" && computerChoice === "ROCK") ||
+        (userChoice === "SCISSORS" && computerChoice === "PAPER")
+      ) {
+        roundResult = "WON";
+        userPoints++;
+      } else {
+        roundResult = "LOSE";
+        computerPoints++;
+      }
+
+      turnsLeft--;
+
+      if (turnsLeft === 0) {
+        gameResult = userPoints > computerPoints ? "WON" : userPoints === computerPoints ? "TIE" : "LOSE";
+      }
+
+      updateUI(userChoice, computerChoice, roundResult);
+    }
+
+    // Function to generate computer's choice
+    function computerChoose() {
+      const choices = ["ROCK", "PAPER", "SCISSORS"];
+      const randomIndex = Math.floor(Math.random() * choices.length);
+      return choices[randomIndex];
+    }
+
+    // Function to update the UI
+    function updateUI(userChoice = "", computerChoice = "", roundResult = "") {
+      const roundsLeftSpan = document.querySelector("span[data-ns-test='rounds-left']");
+      roundsLeftSpan.textContent = turnsLeft.toString();
+
+      const userPointsSpan = document.querySelector("span[data-ns-test='user-points']");
+      userPointsSpan.textContent = userPoints.toString();
+
+      const computerPointsSpan = document.querySelector("span[data-ns-test='computer-points']");
+      computerPointsSpan.textContent = computerPoints.toString();
+
+      const roundResultSpan = document.querySelector("span[data-ns-test='round-result']");
+      roundResultSpan.textContent = roundResult;
+
+      const gameResultSpan = document.querySelector("span[data-ns-test='game-result']");
+      gameResultSpan.textContent = gameResult;
+
+      if (roundResult === "") {
+        roundResultSpan.style.visibility = "hidden";
+      } else {
+        roundResultSpan.style.visibility = "visible";
+      }
+
+      console.log(`User choice: ${userChoice}`);
+      console.log(`Computer choice: ${computerChoice}`);
+      console.log(`Round result: ${roundResult}`);
+    }
+  </script>
 </body>
-
 </html>
